@@ -1,15 +1,12 @@
 var app = require('app');
 var BrowserWindow = require('browser-window');
-var fs = require('fs');
 var ipc = require('ipc');
 var static = require('node-static');
-var AV = require('av');
-require('flac.js');
 
 var fileServer = new static.Server('/Users/tma/Music/');
 
-require('http').createServer(function (request, response) {
-  request.addListener('end', function () {
+require('http').createServer(function(request, response) {
+  request.addListener('end', function() {
     fileServer.serve(request, response);
   }).resume();
 }).listen(49579);
@@ -29,11 +26,6 @@ app.on('ready', function() {
 });
 
 ipc.on('windowCtl', function(event, arg) {
-	console.log('[windowCtl]', arg);
-	win[arg.fn](arg.args);
-});
-
-ipc.on('getFileBuffer', function(event, arg) {
-	console.log('[getFileBuffer]', arg);
-	event.returnValue = fs.readFileSync(arg);
+  console.log('[windowCtl]', arg);
+  win[arg.fn](arg.args);
 });
