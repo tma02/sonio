@@ -1,0 +1,173 @@
+body {
+  margin: 0;
+  font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif; 
+  font-weight: 300;
+}
+
+.title-bar {
+  -webkit-app-region: drag;
+	-webkit-user-select: none;
+  width: calc(100vw - 240px);
+  height: 24px;
+  background: #303033;
+}
+
+.side-bar {
+  width: 240px;
+  height: 100vh;
+  background: rgba(75, 75, 80, 0.9);
+	-webkit-user-select: none;
+}
+
+.frame-btns {
+	display: block;
+	float: left;
+	height: 0;
+	padding-left: 4px;
+}
+
+.frame-btns i {
+	-webkit-app-region: no-drag;
+	vertical-align: middle;
+	color: #303033;
+	cursor: pointer;
+	font-size: 16px;
+	margin-right: -4px;
+}
+
+.brand {
+  -webkit-app-region: drag;
+  position: relative;
+  z-index: 4;
+	width: 240px;
+	height: 24px;
+	background: rgba(120, 120, 128, 0.8);
+	text-align: center;
+	color: #303033;
+}
+
+.btn-container {
+	margin-top: -24px;
+	padding-top: 24px;
+	max-height: calc(100vh - 330px - 24px);
+	overflow-y: scroll;
+}
+
+.side-btn {
+	width: calc(240px - 24px);
+	height: 22px;
+	color: #B8C6D0;
+	cursor: pointer;
+	font-size: 14px;
+	padding: 4px 12px;
+	transition: background 0.25s ease-out;
+}
+
+.side-btn:hover {
+	background: rgba(120, 120, 128, 0.8);
+}
+
+.side-btn .label {
+	vertical-align: middle;
+}
+
+.side-btn i {
+	vertical-align: middle;
+	font-size: 18px;
+	margin-left: 4px;
+	margin-right: 8px;
+}
+
+.side-label {
+	height: 22px;
+	color: rgba(120, 120, 128, 0.8);
+	font-size: 13px;
+	font-weight: 600;
+	padding-top: 8px;
+	padding-left: 18px;
+	margin-bottom: -6px;
+	text-transform: uppercase;
+}
+
+.side-control {
+	position: absolute;
+	bottom: 0;
+	width: 240px;
+	height: 330px;
+	color: #eef;
+	text-align: center;
+}
+
+.side-control .cover-img {
+	height: 240px;
+}
+
+.side-control #slider {
+	margin-top: -4px;
+	width: 240px;
+	height: 6px;
+	background: #303033;
+}
+
+.side-control #slider #slider-inner {
+	background: #B8C6D0;
+	height: 6px;
+	margin-top: -4px;
+	width: 0%;
+}
+
+.side-control #back, 
+.side-control #next {
+	position: relative;
+	font-size: 32px;
+	margin-top: 12px;
+	vertical-align: top;
+}
+
+.side-control #play {
+	position: relative;
+	font-size: 80px;
+	vertical-align: middle;
+	margin-left: 12px;
+	margin-right: 12px;
+}
+
+.side-control .bottom-control {
+	margin-top: -36px;
+	color: #112;
+}
+
+.side-control #repeat {
+	margin-right: 116px;
+}
+
+.control-btn {
+	cursor: pointer;
+	color: #B8C6D0;
+	transition: color 0.25s ease-out;
+}
+
+.bottom-control .control-btn {
+	color: #303033;
+}
+
+.control-btn:hover {
+	color: #fff;
+	transition: color 0.5s ease-out;
+}
+
+.container {
+	position: absolute;
+	z-index: 10;
+	top: 0;
+  width: calc(100vw - 240px);
+  margin-left: 240px;
+  height: 100vh;
+  box-shadow: -10px 0 100px 15px rgba(30, 30, 35, 0.8);
+}
+
+.content {
+  background: rgba(30, 30, 35, 1);
+  width: calc(100vw - 240px);
+  height: calc(100vh - 24px);
+}

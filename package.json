@@ -1,0 +1,21 @@
+{
+  "name": "sonio",
+  "version": "0.0.1",
+  "description": "Music library management and playback built with Electron and Node.",
+  "main": "./src/sonio.js",
+  "scripts": {
+    "test": "electron ."
+  },
+  "author": "Tianyi Ma <tn.ma@outlook.com>",
+  "license": "GPLv2",
+  "private": true,
+  "dependencies": {
+    "jquery": "^2.1.4",
+    "node-static": "^0.7.7",
+    "material-design-icons": "^2.0.0"
+  },
+  "devDependencies": {
+    "electron-rebuild": "^0.2.5",
+    "electron-prebuilt": "^0.30.0"
+  }
+}
