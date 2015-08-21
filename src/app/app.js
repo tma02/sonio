@@ -3,13 +3,20 @@ var BrowserWindow = require('browser-window');
 var ipc = require('ipc');
 var static = require('node-static');
 
-var fileServer = new static.Server('/Users/tma/Music/');
+var musicServer = new static.Server('/Users/tma/Music/');
+var viewServer = new static.Server(__dirname + '/views/', {cache: false});
 
 require('http').createServer(function(request, response) {
   request.addListener('end', function() {
-    fileServer.serve(request, response);
+    musicServer.serve(request, response);
   }).resume();
 }).listen(49579);
+
+require('http').createServer(function(request, response) {
+  request.addListener('end', function() {
+    viewServer.serve(request, response);
+  }).resume();
+}).listen(49580);
 
 var win;
 

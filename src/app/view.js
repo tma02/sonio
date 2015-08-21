@@ -1,20 +1,35 @@
 window.$ = window.jQuery = require('../../node_modules/jquery/dist/jquery.js');
 var ipc = require('ipc');
 var playing = false;
+const NO_REPEAT = 0;
+const REPEAT_LIST = 1;
+const REPEAT_SONG = 2;
+var repeat = NO_REPEAT;
 var fullscreen = false;
 var duration = 0;
-var player = AV.Player.fromURL('http://localhost:49579/test3.flac');
-player.preload();
+var player;
+var metadata;
+loadTrack('/test4.flac');
+loadView('/library-view/index.html');
 //Player
-player.on('duration', function(val) {
-  duration = val;
-  $('#time').find('#remaining').html('-' + msToString(val, true));
-});
-player.on('progress', function(val) {
-  $('#slider-inner').css('width', (100 * (val / duration)) + '%')
-  $('#time').find('#current').html(msToString(val, false));
-  $('#time').find('#remaining').html('-' + msToString(duration - val, true));
-});
+function hookPlayerEvents(player) {
+  player.on('duration', function(val) {
+    duration = val;
+    $('#time').find('#remaining').html('-' + msToString(val, true));
+    $('#time').find('#current').html(msToString(0, false));
+    $('#slider-inner').css('width', 0 + '%');
+  });
+  player.on('progress', function(val) {
+    $('#slider-inner').css('width', (100 * (val / duration)) + '%');
+    $('#time').find('#current').html(msToString(val, false));
+    $('#time').find('#remaining').html('-' + msToString(duration - val, true));
+  });
+  player.on('metadata', function(val) {
+    metadata = val;
+    $('#title').html(metadata.title);
+    $('#subtitle').html(metadata.album + ' - ' + metadata.artist);
+  });
+}
 //Title bar buttons
 $('#close').click(function(e) {
   ipc.send('windowCtl', {fn: 'close', args: []});
@@ -70,7 +85,22 @@ function msToString(val, remaining) {
   }
   return hour > 0 ? hour + ':' : '' + (min % 60).toFixed(0) + ':' + sec;
 }
-
-function loadTrack(url) {
-  
+function loadTrack(url, playAfterLoad) {
+  if (player != null && player.device.device != null) {
+    player.stop();
+    playing = false;
+  }
+  player = AV.Player.fromURL('http://localhost:49579/' + url);
+  hookPlayerEvents(player);
+  player[playAfterLoad ? 'play' : 'preload']();
+  playing = playAfterLoad;
+  $('#play').html(playing ? 'pause' : 'play_arrow');
+}
+function loadView(url) {
+  var contentReq = new XMLHttpRequest();
+  contentReq.addEventListener('load', function() {
+    $('.content').html(this.responseText);
+  });
+  contentReq.open('get', 'http://localhost:49580' + url, true);
+  contentReq.send();
 }

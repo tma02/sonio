@@ -4,12 +4,16 @@ body {
   font-weight: 300;
 }
 
+/* Side bar */
+
 .title-bar {
   -webkit-app-region: drag;
   -webkit-user-select: none;
+  position: relative;
+  z-index: 10;
   width: calc(100vw - 240px);
   height: 24px;
-  background: #303033;
+  background: rgba(57, 57, 60, 0.8);
 }
 
 .side-bar {
@@ -130,6 +134,11 @@ body {
   padding-left: 12px;
   font-size: 24px;
   height: 24px;
+  text-align: left;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  width: calc(240px - 24px);
 }
 
 .side-control .info #subtitle {
@@ -137,7 +146,12 @@ body {
   bottom: 34px;
   padding-left: 12px;
   font-size: 14px;
-  height: 16px;
+  height: 18px;
+  text-align: left;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  width: calc(240px - 24px);
 }
 
 .side-control .info #time {
@@ -235,6 +249,17 @@ body {
 
 .content {
   background: rgba(30, 30, 35, 1);
-  width: calc(100vw - 240px);
-  height: calc(100vh - 24px);
+  width: calc(100vw - 290px);
+  height: calc(100vh - 74px);
+  color: rgba(200, 200, 255, 1);
+  padding: 49px 25px 25px;
+  margin-top: -24px;
+  overflow-y: scroll;
+}
+
+/* Library view */
+
+.view-header {
+  margin-bottom: 24px;
+  border-bottom: 1px solid rgba(120, 120, 128, 1);
 }
