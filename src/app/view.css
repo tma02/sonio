@@ -2,13 +2,13 @@ body {
   margin: 0;
   font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif; 
   font-weight: 300;
+  -webkit-user-select: none;
 }
 
 /* Side bar */
 
 .title-bar {
   -webkit-app-region: drag;
-  -webkit-user-select: none;
   position: relative;
   z-index: 10;
   width: calc(100vw - 240px);
@@ -20,7 +20,6 @@ body {
   width: 240px;
   height: 100vh;
   background: rgba(75, 75, 80, 0.9);
-  -webkit-user-select: none;
 }
 
 .frame-btns {
@@ -113,6 +112,15 @@ body {
   height: 240px;
 }
 
+.cover-btn {
+  transition: color 0.25s ease-out;
+  cursor: pointer;
+}
+
+.cover-btn:hover {
+  color: #eef;
+}
+
 .side-control .info {
   position: absolute;
   top: 0;
@@ -164,7 +172,8 @@ body {
   width: calc(240px - 24px);
 }
 
-#time #remaining {
+#time #remaining,
+#fullscreen {
   float: right;
 }
 
@@ -234,7 +243,6 @@ body {
 
 .control-btn:hover {
   color: #fff;
-  transition: color 0.5s ease-out;
 }
 
 .container {
@@ -252,14 +260,22 @@ body {
   width: calc(100vw - 290px);
   height: calc(100vh - 74px);
   color: rgba(200, 200, 255, 1);
-  padding: 49px 25px 25px;
+  padding: 48px 25px 25px;
   margin-top: -24px;
   overflow-y: scroll;
 }
 
-/* Library view */
+.fullscreen-cover {
+  position: absolute;
+  z-index: 50;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(50, 50, 50, 1);
+  display: none;
+}
 
-.view-header {
-  margin-bottom: 24px;
-  border-bottom: 1px solid rgba(120, 120, 128, 1);
+.context-menu {
+  display: none;
 }

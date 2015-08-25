@@ -4,6 +4,8 @@
   <meta charset="utf-8">
   <link rel="stylesheet" href="view.css">
   <link rel="stylesheet" href="mdfont.css">
+  <style id="view-style">
+  </style>
 </head>
 <body>
   <div class="side-bar">
@@ -17,9 +19,9 @@
     </div>
     <div class="btn-container">
       <div class="side-label">Library</div>
-      <div id="collection" class="side-btn"><i class="material-icons">album</i> <span class="label">Albums</span></div>
-      <div id="collection" class="side-btn"><i class="material-icons">library_music</i> <span class="label">Songs</span></div>
-      <div id="collection" class="side-btn"><i class="material-icons">recent_actors</i> <span class="label">Artists</span></div>
+      <div id="albums" class="side-btn"><i class="material-icons">album</i> <span class="label">Albums</span></div>
+      <div id="songs" class="side-btn"><i class="material-icons">library_music</i> <span class="label">Songs</span></div>
+      <div id="artists" class="side-btn"><i class="material-icons">recent_actors</i> <span class="label">Artists</span></div>
       <div class="side-label">Playlists</div>
       <div id="new-playlist" class="side-btn"><i class="material-icons">playlist_add</i> <span class="label">New Playlist</span></div>
       <div id="playlist-" class="side-btn"><i class="material-icons">queue_music</i> <span class="label">Playlist</span></div>
@@ -36,6 +38,7 @@
       <div class="cover">
         <img class="cover-img" src="https://upload.wikimedia.org/wikipedia/en/d/d0/Alt-J_-_An_Awesome_Wave.png"/>
         <div class="info">
+          <div id="fullscreen"><i class="material-icons cover-btn">fullscreen</i></div>
           <div id="title">Breezeblocks</div>
           <div id="subtitle">An Awesome Wave - alt-J</div>
           <div id="time"><span id="current">0:00</span><span id="remaining">-13:37</span></div>
@@ -58,8 +61,14 @@
     <div class="content">
     </div>
   </div>
-<script src="aurora.js"></script>
-<script src="flac.js"></script>
-<script src="view.js"></script>
+  <div class="fullscreen-cover">
+
+  </div>
+  <div class="context-menu">
+
+  </div>
+  <script src="aurora.js"></script>
+  <script src="flac.js"></script>
+  <script src="view.js"></script>
 </body>
 </html>

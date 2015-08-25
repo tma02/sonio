@@ -5,12 +5,14 @@ const NO_REPEAT = 0;
 const REPEAT_LIST = 1;
 const REPEAT_SONG = 2;
 var repeat = NO_REPEAT;
+var shuffle = false;
 var fullscreen = false;
+var fullscreenCover = false;
 var duration = 0;
 var player;
 var metadata;
 loadTrack('/test4.flac');
-loadView('/library-view/index.html');
+loadView('/album-view');
 //Player
 function hookPlayerEvents(player) {
   player.on('duration', function(val) {
@@ -41,8 +43,23 @@ $('#full').click(function(e) {
   fullscreen = !fullscreen;
   ipc.send('windowCtl', {fn: 'setFullScreen', args: fullscreen});
 });
+//Side bar buttons
+$('#albums').click(function(e) {
+  loadView('/album-view');
+});
+$('#songs').click(function(e) {
+  loadView('/playlist-view');
+});
 //Player control buttons
+$('#fullscreen').click(function(e) {
+  fullscreenCover = !fullscreenCover;
+  ipc.send('windowCtl', {fn: 'setFullScreen', args: fullscreenCover ? true : fullscreen});
+  $('.fullscreen-cover').css('display', 'inherit');
+});
 $('#next').click(function(e) {
+  //todo
+});
+$('#back').click(function(e) {
   //todo
 });
 $('#play').click(function(e) {
@@ -61,6 +78,18 @@ $('#slider').click(function(e) {
     }, 750);
   }
 });
+$('#repeat').click(function(e) {
+  repeat++;
+  if (repeat > REPEAT_SONG) {
+    repeat = NO_REPEAT;
+  }
+  $('#repeat').html(repeat == REPEAT_SONG ? 'repeat_one' : 'repeat');
+  $('#repeat').css('color', repeat != NO_REPEAT ? '#eef' : '');
+});
+$('#shuffle').click(function(e) {
+  shuffle = !shuffle;
+  $('#shuffle').css('color', shuffle ? '#eef' : '');
+});
 //UI events
 $('.info').hover(function(e){
   $('#slider').css('width', 'calc(240px - 24px)');
@@ -72,6 +101,10 @@ $('.info').hover(function(e){
   $('#slider').css('width', '100%');
   $('#slider').css('bottom', '-4px');
   $('#slider').css('height', '4px');
+});
+$('.info').bind('contextmenu', function(e) {
+  console.log('contextmenu');
+  return false;
 });
 //Util
 function msToString(val, remaining) {
@@ -96,11 +129,20 @@ function loadTrack(url, playAfterLoad) {
   playing = playAfterLoad;
   $('#play').html(playing ? 'pause' : 'play_arrow');
 }
-function loadView(url) {
+function loadView(url, content) {
   var contentReq = new XMLHttpRequest();
   contentReq.addEventListener('load', function() {
     $('.content').html(this.responseText);
+    renderContent(content);
   });
-  contentReq.open('get', 'http://localhost:49580' + url, true);
+  contentReq.open('get', 'http://localhost:49580' + url + '/index.html', true);
   contentReq.send();
+
+  var cssReq = new XMLHttpRequest();
+  cssReq.addEventListener('load', function() {
+    $('#view-style').html(this.responseText);
+    renderContent(content);
+  });
+  cssReq.open('get', 'http://localhost:49580' + url + '/index.css', true);
+  cssReq.send();
 }
