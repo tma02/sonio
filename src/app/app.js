@@ -33,22 +33,55 @@ app.scanDir = function() {
       console.log(err);
     }
     if (JSON.stringify(store.fsState) != JSON.stringify(res)) {
-      console.log('Refreshing library index...');
+      console.log('Refreshing library meta index...');
+      var streams = [];
+      var flacCount = 0;
+      var flacReadCount = 0;
       for (var k in res) {
         if (res[k].endsWith('.flac')) {
-          mm(fs.createReadStream(res[k]), function(err, metadata) {
-            if (err) {
-              console.log(err);
-            }
-            if (!store.albums.hasOwnProperty(metadata.album)) {
-              store.albums[metadata.album] = {};
-            }
-            store.albums[metadata.album][metadata.track.no] = {};
-            store.albums[metadata.album][metadata.track.no].metadata = metadata;
-            store.albums[metadata.album][metadata.track.no].url = res[k].replace(store.musicDir + '/', '');
-          });
+          flacCount++;
         }
       }
+      for (var k in res) {
+        if (res[k].endsWith('.flac')) {
+          (function(fileUrl) {
+            mm(streams[streams.push(fs.createReadStream(fileUrl, {autoClose: true})) - 1], {duration: false}, function(err, metadata) {
+              if (err) {
+                console.log(err);
+              }
+              if (!store.albums.hasOwnProperty(metadata.album)) {
+                store.albums[metadata.album] = {
+                  tracks: {},
+                  meta: {
+                    name: metadata.album,
+                    year: metadata.year,
+                    artist: metadata.albumartist,
+                    cover: ''
+                  }
+                };
+              }
+              store.albums[metadata.album].tracks[metadata.track.no] = {};
+              store.albums[metadata.album].tracks[metadata.track.no].meta = metadata;
+              store.albums[metadata.album].tracks[metadata.track.no].url = encodeURI(fileUrl.replace(store.musicDir + '/', ''));
+              flacReadCount++;
+            });
+          })(res[k]);
+        }
+      }
+      var waitForMeta = setInterval(function() {
+        console.log('Waiting for meta index...', flacReadCount + '/' + flacCount);
+        if (flacReadCount >= flacCount) {
+          console.log('Clearing meta streams...');
+          for (var k in streams) {
+            streams[k].close();
+          }
+          win.webContents.send('updateLibrary');
+          clearInterval(waitForMeta);
+        }
+      }, 100);
+    }
+    else {
+      win.webContents.send('updateLibrary');
     }
     store.fsState = res;
     return res;

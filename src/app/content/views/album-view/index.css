@@ -6,10 +6,24 @@
   padding-bottom: 24px;
 }
 
-.view-header .cover-img {
+.view-header .cover {
+  display: inline-block;
   height: 100%;
+  width: 140px;
   margin-right: 16px;
+  text-align: center;
   box-shadow: 0 0 20px 10px rgba(10, 10, 15, 0.3);
+}
+
+.view-header .cover .cover-img {
+  transform: translate(0, -103px);
+  height: 100%;
+}
+
+.view-header .cover i {
+  top: 20px;
+  position: relative;
+  font-size: 100px;
 }
 
 .view-header .info {

@@ -12,21 +12,25 @@
   </div>
 </div>
 <div class="view-content">
-  <table id="playlist-list" class="song-list">
-    <tr>
-      <th style="width: 3%;"></th>
-      <th style="width: 30%;">Song</th>
-      <th style="width: 30%;">Artist</th>
-      <th style="width: 30%;">Album</th>
-      <th style="width: 7%;"><i class="material-icons">av_timer</i></th>
-    </tr>
-    <tr>
-      <td><i class="material-icons play-btn">play_arrow</i></td>
-      <td>Intro</td>
-      <td>alt-J</td>
-      <td>An Awesome Wave</td>
-      <td>13:37</td>
-    </tr>
+  <table class="song-list">
+    <thead>
+      <tr>
+        <th style="width: 3%;"></th>
+        <th style="width: 30%;">Song</th>
+        <th style="width: 30%;">Artist</th>
+        <th style="width: 30%;">Album</th>
+        <th style="width: 7%;"><i class="material-icons">av_timer</i></th>
+      </tr>
+    </thead>
+    <tbody id="playlist-list">
+      <tr>
+        <td><i class="material-icons play-btn">play_arrow</i></td>
+        <td>Intro</td>
+        <td>alt-J</td>
+        <td>An Awesome Wave</td>
+        <td>13:37</td>
+      </tr>
+    </tbody>
   </table>
 </div>
 <script>
@@ -36,6 +40,7 @@ function renderContent(obj) {
       $('#' + k).html(obj.meta[k]);
     }
   }
+  $('#playlist-list').html('');
   for (var k in obj.tracks) {
     $('#playlist-list').append('<tr><td><i id="play-' + k + '" class="material-icons play-btn">play_arrow</i></td><td>' + obj.tracks[k].name + '</td><td>' + obj.tracks[k].artist + '</td><td>' + obj.tracks[k].album + '</td><td>' + obj.tracks[k].time + '</td></tr>');
   }

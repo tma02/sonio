@@ -11,6 +11,7 @@ var fullscreenCover = false;
 var duration = 0;
 var player;
 var metadata;
+var lib;
 //Test
 loadTrack('/test4.flac');
 loadView('/album-view');
@@ -21,6 +22,12 @@ ipc.on('showScreen', function(arg) {
 });
 ipc.on('hideScreen', function(arg) {
   hideScreen();
+});
+ipc.on('updateLibrary', function(arg) {
+  lib = {
+    albums: ipc.sendSync('queryStore', 'albums'),
+    playlists: ipc.sendSync('queryStore', 'playlists')
+  };
 });
 //Player
 function hookPlayerEvents(player) {
@@ -54,16 +61,15 @@ $('#full').click(function(e) {
 });
 //Side bar buttons
 $('#albums').click(function(e) {
-  var albums = ipc.sendSync('queryStore', 'albums');
   var albumObj = {
     meta: {
-      name: albums['Magnifique'][1].metadata.album,
-      year: albums['Magnifique'][1].metadata.year,
-      subtitle: albums['Magnifique'][1].metadata.artist,
-      tracks: albums['Magnifique'].length,
+      name: lib.albums['Magnifique'].meta.name,
+      year: lib.albums['Magnifique'].meta.year,
+      artist: lib.albums['Magnifique'].meta.artist,
+      tracks: lib.albums['Magnifique'].tracks.length,
       playtime: 'unknown'
     },
-    tracks: albums['Magnifique']
+    tracks: lib.albums['Magnifique'].tracks
   };
   loadView('/album-view', albumObj);
 });

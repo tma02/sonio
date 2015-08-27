@@ -1,8 +1,11 @@
 <div class="view-header">
-  <img class="cover-img" src="https://upload.wikimedia.org/wikipedia/en/d/d0/Alt-J_-_An_Awesome_Wave.png"/>
+  <div class="cover">
+    <i class="material-icons">music_note</i>
+    <img class="cover-img" src="https://upload.wikimedia.org/wikipedia/en/d/d0/Alt-J_-_An_Awesome_Wave.png" onerror="this.style.display='none'"/>
+  </div>
   <div class="info">
     <div id="name">An Awesome Wave</div>
-    <div id="subtitle">alt-J</div>
+    <div id="artist">alt-J</div>
     <div id="year" class="label">2012</div>
     <div class="label"><span id="tracks">14</span> tracks</div>
     <div class="label"><span id="playtime">43:31</span> playtime</div>
@@ -13,14 +16,18 @@
   </div>
 </div>
 <div class="view-content">
-  <table id="playlist-list" class="song-list">
-    <tr>
-      <th style="width: 3%;"></th>
-      <th style="width: 3%;">#</th>
-      <th style="width: 50%;">Song</th>
-      <th style="width: 37%;">Artist</th>
-      <th style="width: 7%;"><i class="material-icons">av_timer</i></th>
-    </tr>
+  <table class="song-list">
+    <thead>
+      <tr>
+        <th style="width: 5%;"></th>
+        <th style="width: 5%;">#</th>
+        <th style="width: 50%;">Song</th>
+        <th style="width: 30%;">Artist</th>
+        <th style="width: 10%;"><i class="material-icons">av_timer</i></th>
+      </tr>
+    </thead>
+    <tbody id="playlist-list">
+    </tbody>
   </table>
 </div>
 <script>
@@ -30,11 +37,17 @@ function renderContent(obj) {
       $('.view-header').find('#' + k).html(obj.meta[k]);
     }
   }
+  $('#playlist-list').html('');
   for (var k in obj.tracks) {
-    $('#playlist-list').append('<tr><td><i id="play-' + k + '" class="material-icons play-btn">play_arrow</i></td><td>' + obj.tracks[k].metadata.track.no + '</td><td>' + obj.tracks[k].metadata.title + '</td><td>' + obj.tracks[k].metadata.artist[0] + '</td><td>' + obj.tracks[k].metadata.duration + '</td></tr>');
+    $('#playlist-list').append('<tr><td><i id="list-play" index="' + k + '" url="' + obj.tracks[k].url + '" class="material-icons play-btn">play_arrow</i></td><td>' + obj.tracks[k].meta.track.no + '</td><td>' + obj.tracks[k].meta.title + '</td><td>' + obj.tracks[k].meta.artist[0] + '</td><td>' + obj.tracks[k].meta.duration.toFixed(0) + '</td></tr>');
   }
+  //page events
   $('#play').click(function() {
-
+    loadTrack($('#list-play')[0].attr('url'), true);
+  });
+  $('[id=list-play]').click(function() {
+    console.log($(this).attr('url'));
+    loadTrack($(this).attr('url'), true);
   });
 }
 </script>
