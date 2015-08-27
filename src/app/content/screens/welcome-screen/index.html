@@ -1,0 +1,10 @@
+<div class="welcome">
+  <h1>Welcome to sonio.</h1>
+  <p>Before the music starts, sonio needs to know where your music is.</p>
+  <input type="file" webkitdirectory directory>
+</div>
+<script>
+$('input[type=file]').change(function () {
+  ipc.send('updateStore', {key: 'musicDir', val: this.files[0].path});
+});
+</script>

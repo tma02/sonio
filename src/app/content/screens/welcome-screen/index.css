@@ -1,0 +1,47 @@
+.welcome {
+  margin-top: 30vh;
+  color: #B8C6D0;
+  text-align: center;
+  font-size: 24px;
+}
+
+.welcome h1 {
+  font-weight: normal;
+  font-size: 10vh;
+  text-transform: uppercase;
+  line-height: 0.7em;
+}
+
+.welcome input {
+  color: rgba(0, 0, 0, 0);
+  outline: none;
+  width: 110px;
+}
+
+.welcome input::-webkit-file-upload-button {
+  visibility: hidden;
+}
+
+.welcome input::before {
+  font-size: 16px;
+  color: #B8C6D0;
+  text-transform: uppercase;
+  content: 'Browse';
+  outline: none;
+  white-space: nowrap;
+  -webkit-user-select: none;
+  cursor: pointer;
+  display: inline-block;
+  padding: 6px 20px;
+  background: #B8C6D0;
+  color: rgba(30, 30, 35, 0.8);
+  transition: all 0.25s ease-out;
+}
+
+.welcome input::before {
+  border-color: black;
+}
+
+.welcome input:active::before {
+  background: -webkit-linear-gradient(top, #e3e3e3, #f9f9f9);
+}

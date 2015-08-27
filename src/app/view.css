@@ -258,9 +258,9 @@ body {
 .content {
   background: rgba(30, 30, 35, 1);
   width: calc(100vw - 290px);
-  height: calc(100vh - 74px);
+  height: calc(100vh - 49px);
   color: rgba(200, 200, 255, 1);
-  padding: 48px 25px 25px;
+  padding: 48px 25px 0;
   margin-top: -24px;
   overflow-y: scroll;
 }

@@ -11,8 +11,17 @@ var fullscreenCover = false;
 var duration = 0;
 var player;
 var metadata;
+//Test
 loadTrack('/test4.flac');
 loadView('/album-view');
+//IPC events
+ipc.on('showScreen', function(arg) {
+  loadScreen(arg);
+  $('.fullscreen-cover').css('display', 'inherit');
+});
+ipc.on('hideScreen', function(arg) {
+  hideScreen();
+});
 //Player
 function hookPlayerEvents(player) {
   player.on('duration', function(val) {
@@ -45,7 +54,18 @@ $('#full').click(function(e) {
 });
 //Side bar buttons
 $('#albums').click(function(e) {
-  loadView('/album-view');
+  var albums = ipc.sendSync('queryStore', 'albums');
+  var albumObj = {
+    meta: {
+      name: albums['Magnifique'][1].metadata.album,
+      year: albums['Magnifique'][1].metadata.year,
+      subtitle: albums['Magnifique'][1].metadata.artist,
+      tracks: albums['Magnifique'].length,
+      playtime: 'unknown'
+    },
+    tracks: albums['Magnifique']
+  };
+  loadView('/album-view', albumObj);
 });
 $('#songs').click(function(e) {
   loadView('/playlist-view');
@@ -135,7 +155,7 @@ function loadView(url, content) {
     $('.content').html(this.responseText);
     renderContent(content);
   });
-  contentReq.open('get', 'http://localhost:49580' + url + '/index.html', true);
+  contentReq.open('get', 'http://localhost:49580/views' + url + '/index.html', true);
   contentReq.send();
 
   var cssReq = new XMLHttpRequest();
@@ -143,6 +163,26 @@ function loadView(url, content) {
     $('#view-style').html(this.responseText);
     renderContent(content);
   });
-  cssReq.open('get', 'http://localhost:49580' + url + '/index.css', true);
+  cssReq.open('get', 'http://localhost:49580/views' + url + '/index.css', true);
   cssReq.send();
+}
+function loadScreen(url, content) {
+  var contentReq = new XMLHttpRequest();
+  contentReq.addEventListener('load', function() {
+    $('.fullscreen-cover').html(this.responseText);
+    renderContent(content);
+  });
+  contentReq.open('get', 'http://localhost:49580/screens' + url + '/index.html', true);
+  contentReq.send();
+
+  var cssReq = new XMLHttpRequest();
+  cssReq.addEventListener('load', function() {
+    $('#screen-style').html(this.responseText);
+    renderContent(content);
+  });
+  cssReq.open('get', 'http://localhost:49580/screens' + url + '/index.css', true);
+  cssReq.send();
+}
+function hideScreen() {
+  $('.fullscreen-cover').css('display', 'none');
 }
