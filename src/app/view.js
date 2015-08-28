@@ -9,6 +9,7 @@ var shuffle = false;
 var fullscreen = false;
 var fullscreenCover = false;
 var duration = 0;
+var playingIndex = -1;
 var player;
 var metadata;
 var lib;
@@ -47,6 +48,13 @@ function hookPlayerEvents(player) {
     $('#title').html(metadata.title);
     $('#subtitle').html(metadata.album + ' - ' + metadata.artist);
   });
+  player.on('end', function() {
+    if (repeat == REPEAT_SONG) {
+      player = new AV.Player(new AV.Asset(player.asset.source));
+      hookPlayerEvents(player);
+      player.play();
+    }
+  });
 }
 //Title bar buttons
 $('#close').click(function(e) {
@@ -63,13 +71,13 @@ $('#full').click(function(e) {
 $('#albums').click(function(e) {
   var albumObj = {
     meta: {
-      name: lib.albums['Magnifique'].meta.name,
-      year: lib.albums['Magnifique'].meta.year,
-      artist: lib.albums['Magnifique'].meta.artist,
-      tracks: lib.albums['Magnifique'].tracks.length,
+      name: lib.albums['An Awesome Wave'].meta.name,
+      year: lib.albums['An Awesome Wave'].meta.year,
+      artist: lib.albums['An Awesome Wave'].meta.artist,
+      tracks: lib.albums['An Awesome Wave'].tracks.length,
       playtime: 'unknown'
     },
-    tracks: lib.albums['Magnifique'].tracks
+    tracks: lib.albums['An Awesome Wave'].tracks
   };
   loadView('/album-view', albumObj);
 });
@@ -92,6 +100,12 @@ $('#play').click(function(e) {
   player[playing ? 'pause' : 'play']();
   playing = !playing;
   $('#play').html(playing ? 'pause' : 'play_arrow');
+  if (!playing) {
+    $('[id=list-play]').html('play_arrow');
+  }
+  else {
+    $('[index=' + playingIndex + ']').html('pause');
+  }
 });
 $('#slider').click(function(e) {
   var posX = $(this).css('margin-left').replace('px', '');

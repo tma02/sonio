@@ -39,15 +39,32 @@ function renderContent(obj) {
   }
   $('#playlist-list').html('');
   for (var k in obj.tracks) {
-    $('#playlist-list').append('<tr><td><i id="list-play" index="' + k + '" url="' + obj.tracks[k].url + '" class="material-icons play-btn">play_arrow</i></td><td>' + obj.tracks[k].meta.track.no + '</td><td>' + obj.tracks[k].meta.title + '</td><td>' + obj.tracks[k].meta.artist[0] + '</td><td>' + obj.tracks[k].meta.duration.toFixed(0) + '</td></tr>');
+    $('#playlist-list').append('<tr><td><i id="list-play" index="' + k + '" url="' + obj.tracks[k].url + '" class="material-icons play-btn">play_arrow</i></td><td>' + obj.tracks[k].meta.track.no + '</td><td>' + obj.tracks[k].meta.title + '</td><td>' + obj.tracks[k].meta.artist[0] + '</td><td>' + msToString((obj.tracks[k].meta.duration * 1000).toFixed(0)) + '</td></tr>');
   }
   //page events
   $('#play').click(function() {
-    loadTrack($('#list-play')[0].attr('url'), true);
+    loadTrack($('[id=list-play]')[0].attr('url'), true);
   });
   $('[id=list-play]').click(function() {
-    console.log($(this).attr('url'));
-    loadTrack($(this).attr('url'), true);
+    if (playingIndex == $(this).attr('index')) {
+      player[playing ? 'pause' : 'play']();
+      playing = !playing;
+      $('#play').html(playing ? 'pause' : 'play_arrow');
+      if (!playing) {
+        $('[id=list-play]').html('play_arrow');
+      }
+      else {
+        $(this).html('pause');
+      }
+    }
+    else {
+      console.log($(this).attr('url'));
+      loadTrack($(this).attr('url'), true);
+      playingIndex = $(this).attr('index');
+      $('[id=list-play]').html('play_arrow');
+      $(this).html('pause');
+      playing = true;
+    }
   });
 }
 </script>

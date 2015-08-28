@@ -1,7 +1,7 @@
 /* Album view */
 
 .view-header {
-  margin-bottom: -4px;
+  margin-bottom: 0px;
   height: 140px;
   padding-bottom: 24px;
 }
@@ -93,14 +93,23 @@
   transition: all 0.25s ease-out;
 }
 
+.song-list tr td:first-child {
+  text-align: center;
+}
+
 .song-list td {
   border-bottom: 1px solid rgba(120, 120, 128, 1);
   padding-top: 6px;
+  font-size: 13px;
   padding-bottom: 6px;
 }
 
 .song-list tr:hover {
   background: rgba(50, 50, 58, 1);
+}
+
+.song-list tbody tr:last-child td {
+  border-bottom: 0px solid #000;
 }
 
 .play-btn {
