@@ -10,6 +10,8 @@ var fullscreen = false;
 var fullscreenCover = false;
 var duration = 0;
 var playingIndex = -1;
+var playHistory = [];
+var playingAlbum = 'Kindred';
 var player;
 var metadata;
 var lib;
@@ -50,12 +52,13 @@ function hookPlayerEvents(player) {
     $('#subtitle').html(metadata.album + ' - ' + metadata.artist);
   });
   player.on('end', function() {
-    if (repeat == REPEAT_SONG) {
-      player.stop();
-      player = AV.Player.fromURL(player.asset.source.url);
-      hookPlayerEvents(player);
-      player.play();
-    }
+    window.player.stop();
+    var track = nextTrack();
+    window.player = AV.Player.fromURL('http://localhost:49579/' + track.url);
+    hookPlayerEvents(window.player);
+    window.player[track.play ? 'play' : 'preload']();
+    playing = track.play;
+    syncPlaylistBtns();
   });
 }
 //Title bar buttons
@@ -73,13 +76,13 @@ $('#full').click(function(e) {
 $('#albums').click(function(e) {
   var albumObj = {
     meta: {
-      name: lib.albums['Kindred'].meta.name,
-      year: lib.albums['Kindred'].meta.year.split('-')[0],
-      artist: lib.albums['Kindred'].meta.artist,
-      tracks: lib.albums['Kindred'].tracks.length,
+      name: lib.albums[playingAlbum].meta.name,
+      year: lib.albums[playingAlbum].meta.year.split('-')[0],
+      artist: lib.albums[playingAlbum].meta.artist,
+      tracks: lib.albums[playingAlbum].tracks.length,
       playtime: 'unknown'
     },
-    tracks: lib.albums['Kindred'].tracks
+    tracks: lib.albums[playingAlbum].tracks
   };
   loadView('/album-view', albumObj);
 });
@@ -102,12 +105,7 @@ $('#play').click(function(e) {
   player[playing ? 'pause' : 'play']();
   playing = !playing;
   $('#play').html(playing ? 'pause' : 'play_arrow');
-  if (!playing) {
-    $('[id=list-play]').html('play_arrow');
-  }
-  else {
-    $('[index=' + playingIndex + ']').html('pause');
-  }
+  syncPlaylistBtns();
 });
 $('#slider').click(function(e) {
   var posX = $(this).css('margin-left').replace('px', '');
@@ -208,6 +206,27 @@ function loadScreen(url, content) {
 function hideScreen() {
   $('.fullscreen-cover').css('display', 'none');
 }
-function nextTrackUrl() {
-  
+function syncPlaylistBtns() {
+  $('[id=list-play]').html('play_arrow');
+  if (playing) {
+    $('[index=' + playingIndex + ']').html('pause');
+  }
+}
+function nextTrack() {
+  if (repeat == REPEAT_SONG) {
+    return {play: true, url: player.asset.url};
+  }
+  else if (repeat == REPEAT_LIST) {
+    if (playingIndex == Object.keys(lib.albums[playingAlbum].tracks).length) {
+      playingIndex = 1;
+      return {play: true, url: lib.albums[playingAlbum].tracks[1].url};
+    }
+  }
+  else if (repeat == NO_REPEAT) {
+    if (playingIndex == Object.keys(lib.albums[playingAlbum].tracks).length) {
+      playingIndex = 1;
+      return {play: false, url: lib.albums[playingAlbum].tracks[1].url};
+    }
+  }
+  return {play: true, url: lib.albums[playingAlbum].tracks[++playingIndex].url};
 }
