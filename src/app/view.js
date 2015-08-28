@@ -51,7 +51,8 @@ function hookPlayerEvents(player) {
   });
   player.on('end', function() {
     if (repeat == REPEAT_SONG) {
-      player = new AV.Player(new AV.Asset(player.asset.source));
+      player.stop();
+      player = AV.Player.fromURL(player.asset.source.url);
       hookPlayerEvents(player);
       player.play();
     }
@@ -72,13 +73,13 @@ $('#full').click(function(e) {
 $('#albums').click(function(e) {
   var albumObj = {
     meta: {
-      name: lib.albums['An Awesome Wave'].meta.name,
-      year: lib.albums['An Awesome Wave'].meta.year.split('-')[0],
-      artist: lib.albums['An Awesome Wave'].meta.artist,
-      tracks: lib.albums['An Awesome Wave'].tracks.length,
+      name: lib.albums['Kindred'].meta.name,
+      year: lib.albums['Kindred'].meta.year.split('-')[0],
+      artist: lib.albums['Kindred'].meta.artist,
+      tracks: lib.albums['Kindred'].tracks.length,
       playtime: 'unknown'
     },
-    tracks: lib.albums['An Awesome Wave'].tracks
+    tracks: lib.albums['Kindred'].tracks
   };
   loadView('/album-view', albumObj);
 });
@@ -206,4 +207,7 @@ function loadScreen(url, content) {
 }
 function hideScreen() {
   $('.fullscreen-cover').css('display', 'none');
+}
+function nextTrackUrl() {
+  
 }
