@@ -1,0 +1,39 @@
+@keyframes colors {
+  0% {
+    color: #B8C6D0;
+  }
+  33% {
+    color: #eef;
+  }
+  67% {
+    color: #eef;
+  }
+  100% {
+    color: #B8C6D0;
+  }
+}
+
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-screen {
+  margin-top: 35vh;
+  text-align: center;
+  color: #B8C6D0;
+}
+
+.loading-screen i {
+  font-size: 10vh;
+  animation: rotate 1.5s linear infinite, colors 3s ease-in-out infinite;
+}
+
+.loading-text {
+  font-size: 64px;
+  text-transform: uppercase;
+}

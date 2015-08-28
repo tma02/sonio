@@ -29,6 +29,7 @@ ipc.on('updateLibrary', function(arg) {
     albums: ipc.sendSync('queryStore', 'albums'),
     playlists: ipc.sendSync('queryStore', 'playlists')
   };
+  hideScreen();
 });
 //Player
 function hookPlayerEvents(player) {
@@ -72,7 +73,7 @@ $('#albums').click(function(e) {
   var albumObj = {
     meta: {
       name: lib.albums['An Awesome Wave'].meta.name,
-      year: lib.albums['An Awesome Wave'].meta.year,
+      year: lib.albums['An Awesome Wave'].meta.year.split('-')[0],
       artist: lib.albums['An Awesome Wave'].meta.artist,
       tracks: lib.albums['An Awesome Wave'].tracks.length,
       playtime: 'unknown'

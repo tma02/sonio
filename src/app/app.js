@@ -28,6 +28,7 @@ app.writeStore = function() {
 };
 
 app.scanDir = function() {
+  win.webContents.send('showScreen', '/loading-screen');
   walk(store.musicDir, function(err, res) {
     if (err) {
       console.log(err);
@@ -163,7 +164,6 @@ ipc.on('updateStore', function(event, arg) {
   if (arg.key == 'musicDir') {
     musicServer = new static.Server(store.musicDir);
     app.scanDir();
-    win.webContents.send('hideScreen');
   }
 });
 
