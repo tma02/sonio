@@ -43,16 +43,18 @@ function hookPlayerEvents(player) {
     $('#slider-inner').css('width', 0 + '%');
   });
   player.on('progress', function(val) {
-    $('#slider-inner').css('width', (100 * (val / duration)) + '%');
-    $('#time').find('#current').html(msToString(val, false));
-    $('#time').find('#remaining').html('-' + msToString(duration - val, true));
+    if (nextPlayer == null) {
+      $('#slider-inner').css('width', (100 * (val / duration)) + '%');
+      $('#time').find('#current').html(msToString(val, false));
+      $('#time').find('#remaining').html('-' + msToString(duration - val, true));
+    }
     if (duration - val <= 300 && nextPlayer == null) {
       console.log('Preloading next track...');
       var track = nextTrack(false);
       nextPlayer = AV.Player.fromURL('http://localhost:49579/' + track.url);
       nextPlayer[track.play ? 'play' : 'preload']();
       nextPlayer.url = track.url;
-      hookPlayerEvents(window.player);
+      hookPlayerEvents(nextPlayer);
       setTimeout(function() {
         window.player.stop();
         var track = nextTrack(true);
