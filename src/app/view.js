@@ -11,8 +11,9 @@ var fullscreenCover = false;
 var duration = 0;
 var playingIndex = -1;
 var playHistory = [];
-var playingAlbum = 'Kindred';
+var playingAlbum = 'The Wall (UK)';
 var player;
+var nextPlayer;
 var metadata;
 var lib;
 //Test
@@ -45,6 +46,30 @@ function hookPlayerEvents(player) {
     $('#slider-inner').css('width', (100 * (val / duration)) + '%');
     $('#time').find('#current').html(msToString(val, false));
     $('#time').find('#remaining').html('-' + msToString(duration - val, true));
+    if (duration - val <= 300 && nextPlayer == null) {
+      console.log('Preloading next track...');
+      var track = nextTrack(false);
+      nextPlayer = AV.Player.fromURL('http://localhost:49579/' + track.url);
+      nextPlayer[track.play ? 'play' : 'preload']();
+      nextPlayer.url = track.url;
+      hookPlayerEvents(window.player);
+      setTimeout(function() {
+        window.player.stop();
+        var track = nextTrack(true);
+        if (nextPlayer.url == track.url) {
+          console.log('Using preloaded track');
+          window.player = nextPlayer;
+          nextPlayer = null;
+        }
+        else {
+          window.player = AV.Player.fromURL('http://localhost:49579/' + track.url);
+        }
+        hookPlayerEvents(window.player);
+        window.player[track.play ? 'play' : 'preload']();
+        playing = track.play;
+        syncPlayBtns();
+      }, 300);
+    }
   });
   player.on('metadata', function(val) {
     metadata = val;
@@ -52,13 +77,6 @@ function hookPlayerEvents(player) {
     $('#subtitle').html(metadata.album + ' - ' + metadata.artist);
   });
   player.on('end', function() {
-    window.player.stop();
-    var track = nextTrack();
-    window.player = AV.Player.fromURL('http://localhost:49579/' + track.url);
-    hookPlayerEvents(window.player);
-    window.player[track.play ? 'play' : 'preload']();
-    playing = track.play;
-    syncPlaylistBtns();
   });
 }
 //Title bar buttons
@@ -104,8 +122,7 @@ $('#back').click(function(e) {
 $('#play').click(function(e) {
   player[playing ? 'pause' : 'play']();
   playing = !playing;
-  $('#play').html(playing ? 'pause' : 'play_arrow');
-  syncPlaylistBtns();
+  syncPlayBtns();
 });
 $('#slider').click(function(e) {
   var posX = $(this).css('margin-left').replace('px', '');
@@ -206,27 +223,30 @@ function loadScreen(url, content) {
 function hideScreen() {
   $('.fullscreen-cover').css('display', 'none');
 }
-function syncPlaylistBtns() {
+function syncPlayBtns() {
   $('[id=list-play]').html('play_arrow');
+  $('[id=list-play]').parent().parent().removeClass('active');
   if (playing) {
     $('[index=' + playingIndex + ']').html('pause');
+    $('[index=' + playingIndex + ']').parent().parent().addClass('active');
   }
+  $('#play').html(playing ? 'pause' : 'play_arrow');
 }
-function nextTrack() {
+function nextTrack(incrementIndex) {
   if (repeat == REPEAT_SONG) {
-    return {play: true, url: player.asset.url};
+    return {play: true, url: lib.albums[playingAlbum].tracks[playingIndex].url};
   }
   else if (repeat == REPEAT_LIST) {
     if (playingIndex == Object.keys(lib.albums[playingAlbum].tracks).length) {
-      playingIndex = 1;
+      playingIndex = incrementIndex ? playingIndex : 1;
       return {play: true, url: lib.albums[playingAlbum].tracks[1].url};
     }
   }
   else if (repeat == NO_REPEAT) {
     if (playingIndex == Object.keys(lib.albums[playingAlbum].tracks).length) {
-      playingIndex = 1;
+      playingIndex = incrementIndex ? playingIndex : 1;
       return {play: false, url: lib.albums[playingAlbum].tracks[1].url};
     }
   }
-  return {play: true, url: lib.albums[playingAlbum].tracks[++playingIndex].url};
+  return {play: true, url: lib.albums[playingAlbum].tracks[(incrementIndex ? ++playingIndex : (Number(playingIndex) + 1))].url};
 }

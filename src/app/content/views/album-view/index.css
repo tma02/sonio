@@ -32,7 +32,7 @@
   min-width: 120px;
   height: 100%;
   vertical-align: top;
-  border-left: 1px solid rgba(120, 120, 128, 1);
+  border-left: 1px solid #B8C6D0;
   padding-left: 16px;
 }
 
@@ -98,14 +98,16 @@
 }
 
 .song-list td {
-  border-bottom: 1px solid rgba(120, 120, 128, 1);
+  border-bottom: 1px solid #B8C6D0;
   padding-top: 6px;
   font-size: 13px;
   padding-bottom: 6px;
 }
 
-.song-list tr:hover {
-  background: rgba(50, 50, 58, 1);
+.song-list tr:hover,
+.song-list .active {
+  background: #B8C6D0;
+  color: rgba(30, 30, 35, 0.8);
 }
 
 .song-list tbody tr:last-child td {
