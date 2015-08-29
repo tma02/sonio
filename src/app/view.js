@@ -14,6 +14,7 @@ var playHistory = [];
 var playingAlbum = 'The Wall (UK)';
 var player;
 var nextPlayer;
+var preloading = false;
 var metadata;
 var lib;
 //Test
@@ -48,29 +49,37 @@ function hookPlayerEvents(player) {
       $('#time').find('#current').html(msToString(val, false));
       $('#time').find('#remaining').html('-' + msToString(duration - val, true));
     }
-    if (duration - val <= 300 && nextPlayer == null) {
+    if (duration - val <= 1000 && !preloading) {
       console.log('Preloading next track...');
-      var track = nextTrack(false);
-      nextPlayer = AV.Player.fromURL('http://localhost:49579/' + track.url);
-      nextPlayer[track.play ? 'play' : 'preload']();
-      nextPlayer.url = track.url;
-      hookPlayerEvents(nextPlayer);
-      setTimeout(function() {
-        window.player.stop();
-        var track = nextTrack(true);
-        if (nextPlayer.url == track.url) {
-          console.log('Using preloaded track');
-          window.player = nextPlayer;
-          nextPlayer = null;
+      var preloadInterval = setInterval(function(preloadInterval) {
+        window.player.device.updateTime();
+        if (duration - window.player.device.currentTime <= 420 && nextPlayer == null) {
+          var track = nextTrack(false);
+          nextPlayer = AV.Player.fromURL('http://localhost:49579/' + track.url);
+          nextPlayer[track.play ? 'play' : 'preload']();
+          nextPlayer.url = track.url;
+          hookPlayerEvents(nextPlayer);
+          setTimeout(function() {
+            window.player.stop();
+            var track = nextTrack(true);
+            if (nextPlayer.url == track.url) {
+              console.log('Using preloaded track');
+              window.player = nextPlayer;
+              nextPlayer = null;
+            }
+            else {
+              window.player = AV.Player.fromURL('http://localhost:49579/' + track.url);
+            }
+            hookPlayerEvents(window.player);
+            window.player[track.play ? 'play' : 'preload']();
+            playing = track.play;
+            syncPlayBtns();
+            preloading = false;
+          }, 300);
+          clearInterval(preloadInterval);
         }
-        else {
-          window.player = AV.Player.fromURL('http://localhost:49579/' + track.url);
-        }
-        hookPlayerEvents(window.player);
-        window.player[track.play ? 'play' : 'preload']();
-        playing = track.play;
-        syncPlayBtns();
-      }, 300);
+      }, 50, preloadInterval);
+      preloading = true;
     }
   });
   player.on('metadata', function(val) {
@@ -238,15 +247,13 @@ function nextTrack(incrementIndex) {
   if (repeat == REPEAT_SONG) {
     return {play: true, url: lib.albums[playingAlbum].tracks[playingIndex].url};
   }
-  else if (repeat == REPEAT_LIST) {
-    if (playingIndex == Object.keys(lib.albums[playingAlbum].tracks).length) {
-      playingIndex = incrementIndex ? playingIndex : 1;
+  else if (playingIndex == Object.keys(lib.albums[playingAlbum].tracks).length) {
+    if (repeat == REPEAT_LIST) {
+      playingIndex = incrementIndex ? 1 : playingIndex;
       return {play: true, url: lib.albums[playingAlbum].tracks[1].url};
     }
-  }
-  else if (repeat == NO_REPEAT) {
-    if (playingIndex == Object.keys(lib.albums[playingAlbum].tracks).length) {
-      playingIndex = incrementIndex ? playingIndex : 1;
+    else if (repeat == NO_REPEAT) {
+      playingIndex = incrementIndex ? 1 : playingIndex;
       return {play: false, url: lib.albums[playingAlbum].tracks[1].url};
     }
   }
