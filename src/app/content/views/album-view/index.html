@@ -43,7 +43,10 @@ function renderContent(obj) {
   }
   //page events
   $($('.bottom-btns').find('#play')).click(function() {
-    loadTrack($('[id=list-play]')[0].attr('url'), true);
+    loadTrack($('[index=1]').attr('url'), true);
+    playingIndex = 1;
+    playing = true;
+    syncPlayBtns();
   });
   $('[id=list-play]').click(function() {
     if (playingIndex == $(this).attr('index')) {
@@ -52,7 +55,6 @@ function renderContent(obj) {
       syncPlayBtns();
     }
     else {
-      console.log($(this).attr('url'));
       loadTrack($(this).attr('url'), true);
       playingIndex = $(this).attr('index');
       playing = true;

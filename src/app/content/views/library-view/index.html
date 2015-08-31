@@ -1,5 +1,24 @@
 <div class="library-view">
   <div class="grid">
-    
+    <div class="album">
+      <div class="cover">
+        <i class="material-icons">music_note</i>
+        <img class="cover-img" src="https://upload.wikimedia.org/wikipedia/en/d/d0/Alt-J_-_An_Awesome_Wave.png" onerror="this.style.display='none'"/>
+      </div>
+      <div class="info">
+        <div id="name">An Awesome Wave</div>
+        <div id="artist">alt-J</div>
+      </div>
+    </div>
   </div>
 </div>
+<script>
+function renderContent(obj) {
+  for (var k in obj.albums) {
+    obj.albums[k].name;
+    obj.albums[k].artist;
+    //buffer to dataurl
+    //obj.albums[k][1].meta.picture TODO
+  }
+}
+</script>

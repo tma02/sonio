@@ -11,7 +11,7 @@ var fullscreenCover = false;
 var duration = 0;
 var playingIndex = -1;
 var playHistory = [];
-var playingAlbum = 'The Wall (UK)';
+var playingAlbum = 'The Dark Side Of The Moon';
 var player;
 var nextPlayer;
 var preloading = false;
@@ -50,8 +50,7 @@ function hookPlayerEvents(player) {
       $('#time').find('#remaining').html('-' + msToString(duration - val, true));
     }
     if (duration - val <= 1000 && !preloading) {
-      console.log('Preloading next track...');
-      var preloadInterval = setInterval(function(preloadInterval) {
+      var preloadInterval = setInterval(function() {
         window.player.device.updateTime();
         if (duration - window.player.device.currentTime <= 420 && nextPlayer == null) {
           var track = nextTrack(false);
@@ -63,7 +62,6 @@ function hookPlayerEvents(player) {
             window.player.stop();
             var track = nextTrack(true);
             if (nextPlayer.url == track.url) {
-              console.log('Using preloaded track');
               window.player = nextPlayer;
               nextPlayer = null;
             }
@@ -75,10 +73,10 @@ function hookPlayerEvents(player) {
             playing = track.play;
             syncPlayBtns();
             preloading = false;
-          }, 300);
+          }, 500);
           clearInterval(preloadInterval);
         }
-      }, 50, preloadInterval);
+      }, 50);
       preloading = true;
     }
   });
@@ -108,7 +106,7 @@ $('#albums').click(function(e) {
       name: lib.albums[playingAlbum].meta.name,
       year: lib.albums[playingAlbum].meta.year.split('-')[0],
       artist: lib.albums[playingAlbum].meta.artist,
-      tracks: lib.albums[playingAlbum].tracks.length,
+      tracks: Object.keys(lib.albums[playingAlbum].tracks).length,
       playtime: 'unknown'
     },
     tracks: lib.albums[playingAlbum].tracks
