@@ -101,17 +101,6 @@ $('#full').click(function(e) {
 });
 //Side bar buttons
 $('#albums').click(function(e) {
-  /*var albumObj = {
-    meta: {
-      name: lib.albums[playingAlbum].meta.name,
-      year: lib.albums[playingAlbum].meta.year.split('-')[0],
-      artist: lib.albums[playingAlbum].meta.artist,
-      tracks: Object.keys(lib.albums[playingAlbum].tracks).length,
-      playtime: 'unknown'
-    },
-    tracks: lib.albums[playingAlbum].tracks
-  };
-  loadView('/album-view', albumObj);*/
   var libraryObj = {
     albums: lib.albums
   }
@@ -243,6 +232,9 @@ function syncPlayBtns() {
     $('[index=' + playingIndex + ']').html('pause');
     $('[index=' + playingIndex + ']').parent().parent().addClass('active');
   }
+  else if (!playing && $('.view-header').find('#name').html() == playingAlbum) {
+    $('[index=' + playingIndex + ']').parent().parent().addClass('active');
+  }
   $('#play').html(playing ? 'pause' : 'play_arrow');
 }
 function nextTrack(incrementIndex) {
@@ -260,16 +252,6 @@ function nextTrack(incrementIndex) {
     }
   }
   return {play: true, url: lib.albums[playingAlbum].tracks[(incrementIndex ? ++playingIndex : (Number(playingIndex) + 1))].url};
-}
-function getAlbumArtist(album) {
-  var trackArtists = [];
-  var artistMap = [];
-  if (album.meta.artist.length != 0) {
-    return album.meta.artist[0];
-  }
-  else {
-    return album.tracks[0] == null ? album.tracks[1].meta.artist[0] : album.tracks[0].meta.artist[0];
-  }
 }
 //https://jsperf.com/encoding-xhr-image-data/51
 function arrayBufferDataUri(raw) {
@@ -317,4 +299,21 @@ function arrayBufferDataUri(raw) {
   }
   
   return 'data:image/jpeg;base64,' + base64
+}
+function getAlbumArtist(album) {
+  var trackArtists = [];
+  var artistMap = [];
+  if (album.meta.artist.length != 0) {
+    return album.meta.artist[0];
+  }
+  else {
+    return album.tracks[0] == null ? album.tracks[1].meta.artist[0] : album.tracks[0].meta.artist[0];
+  }
+}
+function getTrackPicture(track) {
+  var imgSrc = '';
+  if (track.meta.picture[0] != null) {
+    imgSrc = arrayBufferDataUri(track.meta.picture[0].data.data);
+  }
+  return imgSrc;
 }

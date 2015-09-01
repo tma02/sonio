@@ -58,10 +58,19 @@ function renderContent(obj) {
       playingAlbum = $('.view-header').find('#name').html();
       loadTrack($(this).attr('url'), true);
       playingIndex = $(this).attr('index');
+      var imgSrc = getTrackPicture(lib.albums[playingAlbum].tracks[playingIndex]);
+      $('.cover-wrapper').find('.cover-img').attr('src', imgSrc);
       playing = true;
       syncPlayBtns();
     }
   });
   window.scrollTo(0, 0);
+  var album = lib.albums[$('.view-header').find('#name').html()];
+  var refTrack = album.tracks[0] == null ? album.tracks[1] :  album.tracks[0];
+  var imgSrc = getTrackPicture(refTrack);
+  $('.view-header').find('.cover-img').attr('src', imgSrc);
+  if (playingAlbum == $('.view-header').find('#name').html()) {
+    syncPlayBtns();
+  }
 }
 </script>

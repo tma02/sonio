@@ -9,10 +9,7 @@ function renderContent(obj) {
     //buffer to dataurl
     //obj.albums[k][1].meta.picture TODO
     var refTrack = obj.albums[k].tracks[0] == null ? obj.albums[k].tracks[1] :  obj.albums[k].tracks[0];
-    var imgSrc = '';
-    if (refTrack.meta.picture[0] != null) {
-      imgSrc = arrayBufferDataUri(refTrack.meta.picture[0].data.data);
-    }
+    var imgSrc = getTrackPicture(refTrack);
     $('.grid').append('<div class="album">' +
       '<div id="album-view-cover" class="cover">' +
         '<i class="material-icons">music_note</i>' +
@@ -37,6 +34,7 @@ function renderContent(obj) {
       tracks: lib.albums[albumName].tracks
     };
     loadView('/album-view', albumObj);
+    syncPlayBtns();
   });
   $('[id=album-view-cover]').click(function() {
     var albumName = $(this).parent().find('.info').find('#album-view-name').html();
@@ -51,6 +49,7 @@ function renderContent(obj) {
       tracks: lib.albums[albumName].tracks
     };
     loadView('/album-view', albumObj);
+    syncPlayBtns();
   });
   window.scrollTo(0, 0);
 }
