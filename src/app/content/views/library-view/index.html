@@ -1,15 +1,5 @@
 <div class="library-view">
   <div class="grid">
-    <span class="album">
-      <div class="cover">
-        <i class="material-icons">music_note</i>
-        <img class="cover-img" src="https://upload.wikimedia.org/wikipedia/en/d/d0/Alt-J_-_An_Awesome_Wave.png" onerror="this.style.display='none'"/>
-      </div>
-      <div class="info">
-        <div id="name">An Awesome Wave</div>
-        <div id="artist">alt-J</div>
-      </div>
-    </span>
   </div>
 </div>
 <script>
@@ -24,7 +14,7 @@ function renderContent(obj) {
       imgSrc = arrayBufferDataUri(refTrack.meta.picture[0].data.data);
     }
     $('.grid').append('<div class="album">' +
-      '<div class="cover">' +
+      '<div id="album-view-cover" class="cover">' +
         '<i class="material-icons">music_note</i>' +
         '<img class="cover-img" src="' + imgSrc + '" onerror="this.style.display=\'none\'"/>' +
       '</div>' +
@@ -35,7 +25,33 @@ function renderContent(obj) {
     '</div>');
   }
   $('[id=album-view-name]').click(function() {
-    loadView('/album-view', lib.albums[$(this).html()]);
+    var albumName = $(this).html();
+    var albumObj = {
+      meta: {
+        name: lib.albums[albumName].meta.name,
+        year: lib.albums[albumName].meta.year.split('-')[0],
+        artist: lib.albums[albumName].meta.artist,
+        tracks: Object.keys(lib.albums[albumName].tracks).length,
+        playtime: 'unknown'
+      },
+      tracks: lib.albums[albumName].tracks
+    };
+    loadView('/album-view', albumObj);
   });
+  $('[id=album-view-cover]').click(function() {
+    var albumName = $(this).parent().find('.info').find('#album-view-name').html();
+    var albumObj = {
+      meta: {
+        name: lib.albums[albumName].meta.name,
+        year: lib.albums[albumName].meta.year.split('-')[0],
+        artist: lib.albums[albumName].meta.artist,
+        tracks: Object.keys(lib.albums[albumName].tracks).length,
+        playtime: 'unknown'
+      },
+      tracks: lib.albums[albumName].tracks
+    };
+    loadView('/album-view', albumObj);
+  });
+  window.scrollTo(0, 0);
 }
 </script>
