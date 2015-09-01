@@ -1,6 +1,6 @@
 <div class="library-view">
   <div class="grid">
-    <div class="album">
+    <span class="album">
       <div class="cover">
         <i class="material-icons">music_note</i>
         <img class="cover-img" src="https://upload.wikimedia.org/wikipedia/en/d/d0/Alt-J_-_An_Awesome_Wave.png" onerror="this.style.display='none'"/>
@@ -9,16 +9,33 @@
         <div id="name">An Awesome Wave</div>
         <div id="artist">alt-J</div>
       </div>
-    </div>
+    </span>
   </div>
 </div>
 <script>
 function renderContent(obj) {
+  $('.grid').html('');
   for (var k in obj.albums) {
-    obj.albums[k].name;
-    obj.albums[k].artist;
     //buffer to dataurl
     //obj.albums[k][1].meta.picture TODO
+    var refTrack = obj.albums[k].tracks[0] == null ? obj.albums[k].tracks[1] :  obj.albums[k].tracks[0];
+    var imgSrc = '';
+    if (refTrack.meta.picture[0] != null) {
+      imgSrc = arrayBufferDataUri(refTrack.meta.picture[0].data.data);
+    }
+    $('.grid').append('<div class="album">' +
+      '<div class="cover">' +
+        '<i class="material-icons">music_note</i>' +
+        '<img class="cover-img" src="' + imgSrc + '" onerror="this.style.display=\'none\'"/>' +
+      '</div>' +
+      '<div class="info">' +
+        '<div id="album-view-name">' + obj.albums[k].meta.name + '</div>' +
+        '<div id="artist">' + getAlbumArtist(obj.albums[k]) + '</div>' +
+      '</div>' +
+    '</div>');
   }
+  $('[id=album-view-name]').click(function() {
+    loadView('/album-view', lib.albums[$(this).html()]);
+  });
 }
 </script>

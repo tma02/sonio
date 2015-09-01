@@ -49,12 +49,13 @@ function renderContent(obj) {
     syncPlayBtns();
   });
   $('[id=list-play]').click(function() {
-    if (playingIndex == $(this).attr('index')) {
+    if (playingIndex == $(this).attr('index') && playingAlbum == $('.view-header').find('#name').html()) {
       player[playing ? 'pause' : 'play']();
       playing = !playing;
       syncPlayBtns();
     }
     else {
+      playingAlbum = $('.view-header').find('#name').html();
       loadTrack($(this).attr('url'), true);
       playingIndex = $(this).attr('index');
       playing = true;

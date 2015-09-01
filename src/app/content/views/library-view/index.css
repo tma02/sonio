@@ -1,19 +1,24 @@
+.library-view {
+}
+
 .library-view .grid {
+  text-align: left;
 }
 
 .library-view .album {
   display: inline-block;
-  height: calc(162px + 72px);
-  width: 162px;
-  box-shadow: 0 0 20px 10px rgba(10, 10, 15, 0.3);
-  margin: 0 10px 14px 0;
+  height: calc(212px + 72px);
+  width: 212px;
+  vertical-align: top;
+  margin: 0 24px 28px 0;
 }
 
 .library-view .cover {
-  height: 162px;
-  width: 162px;
+  height: 212px;
+  width: 212px;
   margin-right: 16px;
   text-align: center;
+  cursor: pointer;
 }
 
 .library-view .cover .cover-img {
@@ -22,22 +27,30 @@
 }
 
 .library-view .cover i {
-  top: 20px;
+  top: 50px;
   position: relative;
   font-size: 100px;
 }
 
 .library-view .info {
-  width: calc(162px - 20px);
+  width: calc(212px - 20px);
   height: 52px;
   background: rgba(57, 57, 60, 0.8);
   color: #B8C6D0;
   padding: 10px;
   font-size: 14px;
   line-height: 1.8em;
-  text-align: left;
 }
 
-.library-view .info #name {
+.library-view .info #album-view-name {
+  color: #eef;
+  cursor: pointer;
   font-weight: bold;
+}
+
+.library-view .info * {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 192px;
+  overflow: hidden;
 }
