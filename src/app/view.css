@@ -289,6 +289,36 @@ body {
   display: none;
 }
 
+.context-layer {  display: none;
+  position: absolute;
+  z-index: 180;
+  width: 100vw;
+  height: 100vh;
+  top: 0;
+  left: 0;
+}
+
 .context-menu {
   display: none;
+  position: absolute;
+  z-index: 200;
+  min-width: 162px;
+  width: auto;
+  background: rgba(75, 75, 80, 0.9);
+  padding-top: 5px;
+  padding-bottom: 5px;
+  border-radius: 5px;
+  overflow: hidden;
+  color: rgba(200, 200, 255, 1);
+}
+
+.context-menu .context-btn {
+  padding: 2px 10px 2px 20px;
+  height: 20px;
+  transition: background 0.25s ease-out;
+}
+
+.context-menu .context-btn:hover {
+  background: rgba(120, 120, 128, 0.8);
+  cursor: pointer;
 }

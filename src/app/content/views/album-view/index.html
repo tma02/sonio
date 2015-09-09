@@ -46,13 +46,13 @@ function renderContent(obj) {
     loadTrack($('[index=1]').attr('url'), true);
     playingIndex = 1;
     playing = true;
-    syncPlayBtns();
+    syncPlaying();
   });
   $('[id=list-play]').click(function() {
     if (playingIndex == $(this).attr('index') && playingAlbum == $('.view-header').find('#name').html()) {
       player[playing ? 'pause' : 'play']();
       playing = !playing;
-      syncPlayBtns();
+      syncPlaying();
     }
     else {
       playingAlbum = $('.view-header').find('#name').html();
@@ -60,8 +60,9 @@ function renderContent(obj) {
       playingIndex = $(this).attr('index');
       var imgSrc = getTrackPicture(lib.albums[playingAlbum].tracks[playingIndex]);
       $('.cover-wrapper').find('.cover-img').attr('src', imgSrc);
+      $('.cover-wrapper').find('.cover-img').removeAttr('style');
       playing = true;
-      syncPlayBtns();
+      syncPlaying();
     }
   });
   window.scrollTo(0, 0);
@@ -70,7 +71,7 @@ function renderContent(obj) {
   var imgSrc = getTrackPicture(refTrack);
   $('.view-header').find('.cover-img').attr('src', imgSrc);
   if (playingAlbum == $('.view-header').find('#name').html()) {
-    syncPlayBtns();
+    syncPlaying();
   }
 }
 </script>

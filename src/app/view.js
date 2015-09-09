@@ -1,4 +1,5 @@
 window.$ = window.jQuery = require('../../node_modules/jquery/dist/jquery.js');
+
 var ipc = require('ipc');
 var playing = false;
 const NO_REPEAT = 0;
@@ -11,23 +12,23 @@ var fullscreenCover = false;
 var duration = 0;
 var playingIndex = -1;
 var playHistory = [];
-var playingAlbum = 'The Dark Side Of The Moon';
+var playingAlbum = '';
 var player;
 var nextPlayer;
 var preloading = false;
 var metadata;
 var lib;
-//Test
-loadTrack('/test4.flac');
-loadView('/album-view');
+
 //IPC events
 ipc.on('showScreen', function(arg) {
   loadScreen(arg);
   $('.fullscreen-cover').css('display', 'inherit');
 });
+
 ipc.on('hideScreen', function(arg) {
   hideScreen();
 });
+
 ipc.on('updateLibrary', function(arg) {
   lib = {
     albums: ipc.sendSync('queryStore', 'albums'),
@@ -35,6 +36,7 @@ ipc.on('updateLibrary', function(arg) {
   };
   hideScreen();
 });
+
 //Player
 function hookPlayerEvents(player) {
   player.on('duration', function(val) {
@@ -43,6 +45,7 @@ function hookPlayerEvents(player) {
     $('#time').find('#current').html(msToString(0, false));
     $('#slider-inner').css('width', 0 + '%');
   });
+
   player.on('progress', function(val) {
     if (nextPlayer == null) {
       $('#slider-inner').css('width', (100 * (val / duration)) + '%');
@@ -58,6 +61,7 @@ function hookPlayerEvents(player) {
           nextPlayer[track.play ? 'play' : 'preload']();
           nextPlayer.url = track.url;
           hookPlayerEvents(nextPlayer);
+
           setTimeout(function() {
             window.player.stop();
             var track = nextTrack(true);
@@ -71,61 +75,75 @@ function hookPlayerEvents(player) {
             hookPlayerEvents(window.player);
             window.player[track.play ? 'play' : 'preload']();
             playing = track.play;
-            syncPlayBtns();
+            syncPlaying();
             preloading = false;
           }, 500);
+
           clearInterval(preloadInterval);
         }
       }, 50);
       preloading = true;
     }
   });
+
   player.on('metadata', function(val) {
     metadata = val;
     $('#title').html(metadata.title);
     $('#subtitle').html(metadata.album + ' - ' + metadata.artist);
   });
+
   player.on('end', function() {
   });
 }
+
 //Title bar buttons
 $('#close').click(function(e) {
   ipc.send('windowCtl', {fn: 'close', args: []});
 });
+
 $('#mini').click(function(e) {
   ipc.send('windowCtl', {fn: 'minimize', args: []});
 });
+
 $('#full').click(function(e) {
   fullscreen = !fullscreen;
   ipc.send('windowCtl', {fn: 'setFullScreen', args: fullscreen});
 });
+
 //Side bar buttons
+
 $('#albums').click(function(e) {
   var libraryObj = {
     albums: lib.albums
   }
   loadView('/library-view', libraryObj);
 });
+
 $('#songs').click(function(e) {
   loadView('/playlist-view');
 });
+
 //Player control buttons
 $('#fullscreen').click(function(e) {
   fullscreenCover = !fullscreenCover;
   ipc.send('windowCtl', {fn: 'setFullScreen', args: fullscreenCover ? true : fullscreen});
   $('.fullscreen-cover').css('display', 'inherit');
 });
+
 $('#next').click(function(e) {
   //todo
 });
+
 $('#back').click(function(e) {
   //todo
 });
+
 $('#play').click(function(e) {
   player[playing ? 'pause' : 'play']();
   playing = !playing;
-  syncPlayBtns();
+  syncPlaying();
 });
+
 $('#slider').click(function(e) {
   var posX = $(this).css('margin-left').replace('px', '');
   var relX = e.pageX - posX;
@@ -137,6 +155,7 @@ $('#slider').click(function(e) {
     }, 750);
   }
 });
+
 $('#repeat').click(function(e) {
   repeat++;
   if (repeat > REPEAT_SONG) {
@@ -145,10 +164,12 @@ $('#repeat').click(function(e) {
   $('#repeat').html(repeat == REPEAT_SONG ? 'repeat_one' : 'repeat');
   $('#repeat').css('color', repeat != NO_REPEAT ? '#eef' : '');
 });
+
 $('#shuffle').click(function(e) {
   shuffle = !shuffle;
   $('#shuffle').css('color', shuffle ? '#eef' : '');
 });
+
 //UI events
 $('.info').hover(function(e){
   $('#slider').css('width', 'calc(240px - 24px)');
@@ -161,10 +182,21 @@ $('.info').hover(function(e){
   $('#slider').css('bottom', '-4px');
   $('#slider').css('height', '4px');
 });
+
 $('.info').bind('contextmenu', function(e) {
-  console.log('contextmenu');
-  return false;
+  renderContextMenu({items: [{text: 'Test', func: function(){console.log('hello world')}}], clientX: e.clientX, clientY: e.clientY});
+  $('.context-layer').css('display', 'inherit');
 });
+
+$('.context-layer').click(function() {
+  closeContextMenu();
+});
+
+function closeContextMenu() {
+  $('.context-menu').css('display', 'none');
+  $('.context-layer').css('display', 'none');
+}
+
 //Util
 function msToString(val, remaining) {
   var sec = val / 1000;
@@ -175,8 +207,9 @@ function msToString(val, remaining) {
   if (sec < 10) {
     sec = '0' + sec;
   }
-  return hour > 0 ? hour + ':' : '' + (min % 60).toFixed(0) + ':' + sec;
+  return (hour > 0 ? hour + ':' + ((min.toFixed(0) % 60) >= 10 ? '' : '0') : '') + (min.toFixed(0) % 60) + ':' + sec;
 }
+
 function loadTrack(url, playAfterLoad) {
   if (player != null && player.device.device != null) {
     player.stop();
@@ -188,6 +221,7 @@ function loadTrack(url, playAfterLoad) {
   playing = playAfterLoad;
   $('#play').html(playing ? 'pause' : 'play_arrow');
 }
+
 function loadView(url, content) {
   var contentReq = new XMLHttpRequest();
   contentReq.addEventListener('load', function() {
@@ -205,6 +239,7 @@ function loadView(url, content) {
   cssReq.open('get', 'http://localhost:49580/views' + url + '/index.css', true);
   cssReq.send();
 }
+
 function loadScreen(url, content) {
   var contentReq = new XMLHttpRequest();
   contentReq.addEventListener('load', function() {
@@ -222,10 +257,12 @@ function loadScreen(url, content) {
   cssReq.open('get', 'http://localhost:49580/screens' + url + '/index.css', true);
   cssReq.send();
 }
+
 function hideScreen() {
-  $('.fullscreen-cover').css('display', 'none');
+  $('.fullscreen-cover').fadeOut(500);
 }
-function syncPlayBtns() {
+
+function syncPlaying() {
   $('[id=list-play]').html('play_arrow');
   $('[id=list-play]').parent().parent().removeClass('active');
   if (playing && $('.view-header').find('#name').html() == playingAlbum) {
@@ -236,7 +273,12 @@ function syncPlayBtns() {
     $('[index=' + playingIndex + ']').parent().parent().addClass('active');
   }
   $('#play').html(playing ? 'pause' : 'play_arrow');
+  //image for cover
+  var imgSrc = getTrackPicture(lib.albums[playingAlbum].tracks[playingIndex]);
+  $('.cover-wrapper').find('.cover-img').attr('src', imgSrc);
+  $('.cover-wrapper').find('.cover-img').removeAttr('style');
 }
+
 function nextTrack(incrementIndex) {
   if (repeat == REPEAT_SONG) {
     return {play: true, url: lib.albums[playingAlbum].tracks[playingIndex].url};
@@ -253,6 +295,7 @@ function nextTrack(incrementIndex) {
   }
   return {play: true, url: lib.albums[playingAlbum].tracks[(incrementIndex ? ++playingIndex : (Number(playingIndex) + 1))].url};
 }
+
 //https://jsperf.com/encoding-xhr-image-data/51
 function arrayBufferDataUri(raw) {
   var base64 = ''
@@ -300,6 +343,7 @@ function arrayBufferDataUri(raw) {
   
   return 'data:image/jpeg;base64,' + base64
 }
+
 function getAlbumArtist(album) {
   var trackArtists = [];
   var artistMap = [];
@@ -310,10 +354,40 @@ function getAlbumArtist(album) {
     return album.tracks[0] == null ? album.tracks[1].meta.artist[0] : album.tracks[0].meta.artist[0];
   }
 }
+
+function getAlbumPlaytime(album) {
+  var totalDuration = 0;
+  for (var k in album.tracks) {
+    totalDuration += album.tracks[k].meta.duration;
+  }
+  return totalDuration;
+}
+
 function getTrackPicture(track) {
   var imgSrc = '';
   if (track.meta.picture[0] != null) {
     imgSrc = arrayBufferDataUri(track.meta.picture[0].data.data);
   }
   return imgSrc;
+}
+
+function renderContextMenu(contextObj) {
+  $('.context-menu').css('left', contextObj.clientX);
+  $('.context-menu').css('top', contextObj.clientY);
+  $('.context-menu').html('');
+  for (var k in contextObj.items) {
+    /*var id = window.btoa(JSON.stringify(contextObj.items[k], function(key, val) {
+      if (typeof val === 'function') {
+        return val + '';
+      }
+      return val;
+    }));*/
+    var btn = $('<div class="context-btn">' + contextObj.items[k].text + '</div>');
+    $('.context-menu').append(btn);
+    btn.click(function() {
+      closeContextMenu();
+      contextObj.items[k].func();
+    });
+  }
+  $('.context-menu').css('display', 'inherit');
 }

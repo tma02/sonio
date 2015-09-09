@@ -12,7 +12,8 @@ app.initStore = function() {
     musicDir: '',
     albums: {},
     playlists: {},
-    fsState: []
+    fsState: [],
+    disableTransparent: false
   };
 };
 
@@ -138,7 +139,7 @@ app.on('will-quit', function() {
 });
 
 app.on('ready', function() {
-  win = new BrowserWindow({width: 1000, height: 600, transparent: true, frame: false});
+  win = new BrowserWindow({width: 1000, height: 600, transparent: !store.disableTransparent, frame: store.disableTransparent});
   win.loadUrl('file://' + __dirname + '/view.html');
   win.webContents.on('did-finish-load', function() {
     if (store.musicDir === '') {
@@ -170,4 +171,9 @@ ipc.on('updateStore', function(event, arg) {
 ipc.on('queryStore', function(event, arg) {
   console.log('[queryStore]', arg);
   event.returnValue = store[arg];
+});
+
+ipc.on('createPlaylist', function(event, arg) {
+  console.log('[createPlaylist]', arg);
+  store.playlists.push(arg);
 });
