@@ -1,10 +1,10 @@
 var app = require('app');
 var BrowserWindow = require('browser-window');
 var ipc = require('ipc');
-var static = require('node-static');
 var mm = require('musicmetadata');
 var walk = require('./walk.js');
-var win;
+
+var static = require('node-static');
 
 //Store file util functions
 app.initStore = function() {
@@ -12,15 +12,14 @@ app.initStore = function() {
     musicDir: '',
     albums: {},
     playlists: {},
-    fsState: [],
-    disableTransparent: false
+    fsState: []
   };
 };
 
-app.newPlaylist = function(name) {
+app.newPlaylist = function(title) {
   store.playlists.push({
-    name: name,
-    songs: []
+    title: title,
+    songs: {}
   });
 };
 
@@ -29,19 +28,20 @@ app.writeStore = function() {
 };
 
 app.scanDir = function() {
-  win.webContents.send('showScreen', '/loading-screen');
+  windows[0].webContents.send('showScreen', 'LoadingScreen');
   walk(store.musicDir, function(err, res) {
     if (err) {
       console.log(err);
     }
-    if (JSON.stringify(store.fsState) != JSON.stringify(res)) {
+    if (JSON.stringify(store.fsState) !== JSON.stringify(res)) {
       console.log('Refreshing library meta index...');
       var streams = [];
-      var flacCount = 0;
-      var flacReadCount = 0;
+      var fileCount = 0;
+      var fileReadCount = 0;
       for (var k in res) {
+        //supported formats
         if (res[k].endsWith('.flac')) {
-          flacCount++;
+          fileCount++;
         }
       }
       for (var k in res) {
@@ -62,28 +62,36 @@ app.scanDir = function() {
                   }
                 };
               }
-              store.albums[metadata.album].tracks[metadata.track.no] = {};
-              store.albums[metadata.album].tracks[metadata.track.no].meta = metadata;
-              store.albums[metadata.album].tracks[metadata.track.no].url = encodeURI(fileUrl.replace(store.musicDir + '/', ''));
-              flacReadCount++;
+              var album = store.albums[metadata.album];
+              var index = metadata.track.no;
+              if (album.tracks[metadata.track.no] != null) {
+                index = album.tracks.length;
+                album.tracks[album.tracks.length] = {};
+              }
+              album.tracks[index] = {};
+              album.tracks[index].meta = metadata;
+              album.tracks[index].url = encodeURI(fileUrl.replace(store.musicDir + '/', ''));
+              fileReadCount++;
             });
           })(res[k]);
         }
       }
       var waitForMeta = setInterval(function() {
-        console.log('Waiting for meta index...', flacReadCount + '/' + flacCount);
-        if (flacReadCount >= flacCount) {
+        console.log('Waiting for meta index...', fileReadCount + '/' + fileCount);
+        if (fileReadCount >= fileCount) {
           console.log('Clearing meta streams...');
           for (var k in streams) {
             streams[k].close();
+            streams[k] = null;
           }
-          win.webContents.send('updateLibrary');
+          app.writeStore();
+          windows[0].webContents.send('updateLibrary');
           clearInterval(waitForMeta);
         }
       }, 100);
     }
     else {
-      win.webContents.send('updateLibrary');
+      windows[0].webContents.send('updateLibrary');
     }
     store.fsState = res;
     return res;
@@ -108,55 +116,105 @@ catch (e) {
   app.initStore();
 }
 
-//Start static file servers
 var musicServer = new static.Server(store.musicDir);
-var viewServer = new static.Server(__dirname + '/content/', {cache: false});
-
 var http = require('http');
 http.createServer(function(request, response) {
   request.addListener('end', function() {
     musicServer.serve(request, response);
   }).resume();
 }).listen(49579);
-http.createServer(function(request, response) {
-  request.addListener('end', function() {
-    viewServer.serve(request, response);
-  }).resume();
-}).listen(49580);
 
-//Handle app events
+var name = require('app').getName();
+var menuTemplate = [{
+  label: name,
+  submenu: [
+    {
+      label: 'About ' + name,
+      role: 'about'
+    },
+    {
+      type: 'separator'
+    },
+    {
+      label: 'Preferences...',
+      accelerator: 'Command+,',
+      click: function() {
+        windows[0].webContents.send('showScreen', 'Settings');
+      }
+    },
+    {
+      type: 'separator'
+    },
+    {
+      label: 'Services',
+      role: 'services',
+      submenu: []
+    },
+    {
+      type: 'separator'
+    },
+    {
+      label: 'Hide ' + name,
+      accelerator: 'Command+H',
+      role: 'hide'
+    },
+    {
+      label: 'Hide Others',
+      accelerator: 'Command+Shift+H',
+      role: 'hideothers'
+    },
+    {
+      label: 'Show All',
+      role: 'unhide'
+    },
+    {
+      type: 'separator'
+    },
+    {
+      label: 'Quit',
+      accelerator: 'Command+Q',
+      click: function() { app.quit(); }
+    }
+  ]
+}];
+
+var Menu = require('menu');
+var menu = Menu.buildFromTemplate(menuTemplate);
+
+var windows = [];
+
 app.on('window-all-closed', function() {
   app.quit();
 });
 
 process.on('SIGINT', function() {
+  windows[0].hide();
   app.writeStore();
   process.exit();
 });
 
 app.on('will-quit', function() {
+  windows[0].hide();
   app.writeStore();
 });
 
 app.on('ready', function() {
-  win = new BrowserWindow({width: 1000, height: 600, transparent: !store.disableTransparent, frame: store.disableTransparent});
-  win.loadUrl('file://' + __dirname + '/view.html');
-  win.webContents.on('did-finish-load', function() {
+  console.log('Electron ready, starting BrowserWindow...');
+  //Menu.setApplicationMenu(menu);
+  windows[0] = new BrowserWindow({width: 1150, height: 750});
+
+  windows[0].loadUrl('file://' + __dirname + '/browser/dist/index.html');
+  windows[0].webContents.on('did-finish-load', function() {
     if (store.musicDir === '') {
-      win.webContents.send('showScreen', '/welcome-screen');
+      windows[0].webContents.send('showScreen', 'WelcomeScreen');
     }
     else {
       app.scanDir();
     }
   });
-  win.on('closed', function() {
-    win = null;
+  windows[0].on('closed', function() {
+    windows[0] = null;
   });
-});
-
-ipc.on('windowCtl', function(event, arg) {
-  console.log('[windowCtl]', arg);
-  win[arg.fn](arg.args);
 });
 
 ipc.on('updateStore', function(event, arg) {
@@ -171,9 +229,14 @@ ipc.on('updateStore', function(event, arg) {
 ipc.on('queryStore', function(event, arg) {
   console.log('[queryStore]', arg);
   event.returnValue = store[arg];
+  event.sender.send('queryStoreRes', {data: store[arg], key: arg});
 });
 
-ipc.on('createPlaylist', function(event, arg) {
+ipc.on('getStoreDir', function(event, arg) {
+  event.returnValue = sonioDir + storeDir;
+});
+
+ipc.on('createPlaylist', function(event, title) {
   console.log('[createPlaylist]', arg);
-  store.playlists.push(arg);
+  app.newPlaylist(arg);
 });

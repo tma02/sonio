@@ -1449,10 +1449,6 @@ Decoder = (function(_super) {
   Decoder.prototype.seek = function(timestamp) {
     var seekPoint;
     seekPoint = this.demuxer.seek(timestamp);
-    if (seekPoint == null) {
-      console.log('No seektable');
-      return -1;
-    }
     this.stream.seek(seekPoint.offset);
     return seekPoint.timestamp;
   };
@@ -3502,11 +3498,6 @@ Player = (function(_super) {
 
   Player.prototype.seek = function(timestamp) {
     var _ref;
-    timestamp = (timestamp / 1000) * this.format.sampleRate;
-    timestamp = this.asset.decoder.seek(timestamp);
-    if (timestamp == -1) {
-      return timestamp;
-    }
     if ((_ref = this.device) != null) {
       _ref.stop();
     }
@@ -3521,6 +3512,8 @@ Player = (function(_super) {
         }
       };
     })(this));
+    timestamp = (timestamp / 1000) * this.format.sampleRate;
+    timestamp = this.asset.decoder.seek(timestamp);
     this.currentTime = timestamp / this.format.sampleRate * 1000 | 0;
     this.queue.reset();
     return this.currentTime;

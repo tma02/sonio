@@ -1,0 +1,1 @@
+ThemeManager.setTheme(ThemeManager.types.LIGHT);
